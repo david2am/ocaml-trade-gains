@@ -2,7 +2,6 @@ type data = { unit_cost : float ; quantity : int }
 type trade = Buy of data | Sell of data
 type tax =  NoTax | Tax of float
 type trade_result = Loss | Draw | Win
-type state = ProcessProfit | ProcessAmount
 
 let calculate_amount data =
   let { unit_cost; quantity } = data in
@@ -16,7 +15,7 @@ let calculate_weight_avg prev_weight_avg prev_data data =
   let prev_quantity = Int.to_float prev_data.quantity in
 
   if prev_quantity = 0. then unit_cost
-  else (prev_quantity *. prev_weight_avg +. quantity *. unit_cost) /. (prev_quantity +. quantity) (** prev_weight_avg can be replaced by the prev_data.unit_cost *)
+  else (prev_quantity *. prev_weight_avg +. quantity *. unit_cost) /. (prev_quantity +. quantity)
 
 let calculate_profit weight_avg data =
   let { unit_cost; quantity } = data in
