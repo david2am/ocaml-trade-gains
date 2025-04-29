@@ -1,2 +1,2 @@
 (library
- (name ocaml_trade_gains))
+ (name trade))
