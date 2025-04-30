@@ -1,7 +1,5 @@
 type data = { unit_cost : float ; quantity : int }
 type trade = Buy of data | Sell of data
-type tax =  NoTax | Tax of float
 
-val calc_tax_builder : float -> float -> trade -> tax
-val print_tax : tax -> unit
-val print_tax_list : tax list -> unit
+val calc_tax_builder : float -> float -> trade -> float option
+val print_tax_list : float option list -> unit
