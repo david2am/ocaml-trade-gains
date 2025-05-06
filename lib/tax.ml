@@ -29,7 +29,7 @@ let calculate_loss_and_profit loss profit =
   else
     0., profit -. loss    
 
-let calc_tax_builder threshold tax_percent =
+let calc_tax_builder ~threshold ~tax_percent =
   let weight_avg = ref 0. in
   let stock_qty = ref 0 in
   let acc_loss = ref 0. in
