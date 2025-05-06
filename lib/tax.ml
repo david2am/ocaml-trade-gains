@@ -60,10 +60,11 @@ let calculate_tax_builder ~threshold ~tax_percent =
       | _ -> None
       end
 
-let print_tax t =
+let print_tax i t =
+  let i = i + 1 in
   match t with
-  | None -> print_endline "No Tax"
-  | Some tax -> Printf.printf "Tax %.2f\n" tax
+  | None -> print_endline ("Op " ^ Int.to_string i ^ " Tax: 0")
+  | Some tax -> Printf.printf "Op %d Tax: %.0f\n" i tax
 
 let print_tax_list taxes = 
-  List.iter print_tax taxes
+  List.iteri print_tax taxes

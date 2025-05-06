@@ -1,6 +1,5 @@
 open Trade.Tax
 
-(* Test cases data *)
 let test_data = [
   (* Case 1 *)
   (
@@ -100,7 +99,6 @@ let test_data = [
   );
 ]
 
-(* Create test cases from the data *)
 let create_test_case idx (input, expect) =
   let test_name = Printf.sprintf "Case %d" (idx + 1) in
   let test_fun () =
