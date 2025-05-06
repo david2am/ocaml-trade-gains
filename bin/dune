@@ -1,4 +1,4 @@
 (executable
- (public_name ocaml-trade-gains)
+ (public_name ocaml-trade-tax)
  (name main)
  (libraries trade))

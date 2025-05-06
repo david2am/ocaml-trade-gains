@@ -1,6 +1,6 @@
 (lang dune 3.18)
 
-(name ocaml-trade-gains)
+(name ocaml-trade-tax)
 
 (generate_opam_files true)
 
@@ -16,7 +16,7 @@
 (documentation https://url/to/documentation)
 
 (package
- (name ocaml-trade-gains)
+ (name ocaml-trade-tax)
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends
