@@ -104,8 +104,8 @@ let test_data = [
 let create_test_case idx (input, expect) =
   let test_name = Printf.sprintf "Case %d" (idx + 1) in
   let test_fun () =
-    let calc_tax = calc_tax_builder ~threshold:20000. ~tax_percent:0.2 in
-    let actual = List.map calc_tax input in
+    let calculate_tax = calculate_tax_builder ~threshold:20000. ~tax_percent:0.2 in
+    let actual = List.map calculate_tax input in
     
     Alcotest.(check (float 0.0001 |> option |> list)) test_name expect actual
   in
