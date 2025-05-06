@@ -1,20 +1,16 @@
 open Trade.Tax
 
-let threshold = 20000.
-let tax_percent = 0.2
-
-(* Case 1 + 2 *)
-let input = [
-  Buy  { unit_cost = 10.; quantity = 100 };
-  Sell { unit_cost = 15.; quantity = 50  };
-  Sell { unit_cost = 15.; quantity = 50  };
-  Buy  { unit_cost = 10.; quantity = 10000 };
-  Sell { unit_cost = 20.; quantity = 5000  };
-  Sell { unit_cost = 5. ; quantity = 5000  };
-]
-
-let calc_tax = calc_tax_builder threshold tax_percent
-
 let () =
-  print_endline "\nHello, World!";
+  let calc_tax = calc_tax_builder 20000. 0.2 in
+  let input = [
+    Buy  { unit_cost = 5000.;  quantity = 10 };
+    Sell { unit_cost = 4000.;  quantity = 5  };
+    Buy  { unit_cost = 15000.; quantity = 5  };
+    Buy  { unit_cost = 4000.;  quantity = 2  };
+    Buy  { unit_cost = 23000.; quantity = 2  };
+    Sell { unit_cost = 20000.; quantity = 1  };
+    Sell { unit_cost = 12000.; quantity = 10 };
+    Sell { unit_cost = 15000.; quantity = 3  };
+  ] in
+  print_endline "\n(Output)";
   print_tax_list (List.map calc_tax input)
