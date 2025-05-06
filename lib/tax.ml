@@ -15,7 +15,7 @@ let calculate_weight_avg old_weight_avg stocks { unit_cost; quantity } =
     (stocks *. old_weight_avg +. quantity *. unit_cost) /. (stocks +. quantity)
 
 let calculate_profit weight_avg data = 
-  (Int.to_float data.quantity) *. (data.unit_cost -. weight_avg)
+  (data.unit_cost -. weight_avg) *. (Int.to_float data.quantity)
 
 let operation_result profit =
   match compare profit 0. with
@@ -23,10 +23,12 @@ let operation_result profit =
     |  1 -> Win
     |  _ -> Draw
 
-let calculate_tax profit tax_percent =
-  profit *. tax_percent
+let calculate_tax net_profit tax_percent =
+  if net_profit > 0. then
+    Some (net_profit *. tax_percent)
+  else None
 
-let calculate_loss__net_profit loss profit =
+let calculate_loss_and_profit loss profit =
   if loss > profit then
     loss -. profit, 0.  (* profits are deducted from losses, no profit *)
   else
@@ -41,27 +43,24 @@ let calc_tax_builder threshold tax_percent =
     match trade with
     | Buy data ->
       weight_avg := calculate_weight_avg !weight_avg !stock_qty data;
-      stock_qty := !stock_qty + data.quantity; None
+      stock_qty := !stock_qty + data.quantity;
+      None
     | Sell data ->
       if !stock_qty < data.quantity then
         failwith "Cannot sell more stocks than owned";
 
-      let gross_profit = calculate_profit !weight_avg data in
       stock_qty := !stock_qty - data.quantity;
+      let gross_profit = calculate_profit !weight_avg data in
 
       begin match operation_result gross_profit with
-      | Loss ->
-        acc_loss := !acc_loss -. gross_profit; None
+      | Loss -> acc_loss := !acc_loss -. gross_profit; None
       | Draw -> None
-      | Win -> 
-        let loss, net_profit = calculate_loss__net_profit !acc_loss gross_profit in
-        acc_loss := loss;
-        let amount = calculate_amount data in
-
-        if amount > threshold && net_profit > 0. then
-          Some (calculate_tax net_profit tax_percent)
-        else
-          None
+      | Win ->
+        if calculate_amount data > threshold then
+          let loss, net_profit = calculate_loss_and_profit !acc_loss gross_profit in
+          acc_loss := loss;
+          calculate_tax net_profit tax_percent
+        else None
       end
 
 let print_tax t =
