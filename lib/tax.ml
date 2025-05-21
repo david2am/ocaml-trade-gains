@@ -15,48 +15,51 @@ let calculate_profit weight_avg data =
   (data.unit_cost -. weight_avg) *. Int.to_float data.quantity
 
 let operation_result profit =
-  match compare profit 0. with
-    | -1 -> Loss
-    |  1 -> Win
-    |  _ -> Draw
+  if profit < 0. then Loss
+  else if profit > 0. then Win
+  else Draw
 
 let calculate_amount data = 
   data.unit_cost *. Int.to_float data.quantity
 
 let calculate_loss_and_profit loss profit =
-  if loss > profit then
-    loss -. profit, 0.
-  else
-    0., profit -. loss    
+  let remaining_loss = Float.max 0. (loss -. profit) in
+  let net_profit = Float.max 0. (profit -. loss) in
+  (remaining_loss, net_profit)
+
+type calculator_state = {
+  weight_avg : float;
+  stock_qty : int;
+  acc_loss : float;
+}
 
 let calculate_tax_builder ~threshold ~tax_percent =
-  let weight_avg = ref 0. in
-  let stock_qty = ref 0 in
-  let acc_loss = ref 0. in
+  let state = ref { weight_avg = 0.; stock_qty = 0; acc_loss = 0. } in
 
   fun trade ->
     match trade with
     | Buy data ->
-      weight_avg := calculate_weight_avg !weight_avg !stock_qty data;
-      stock_qty := !stock_qty + data.quantity;
+      state := {
+        !state with
+        weight_avg = calculate_weight_avg !state.weight_avg !state.stock_qty data;
+        stock_qty = !state.stock_qty + data.quantity;
+      };
       None
     | Sell data ->
-      if !stock_qty < data.quantity then
+      if !state.stock_qty < data.quantity then
         failwith "Cannot sell more stocks than owned";
 
-      stock_qty := !stock_qty - data.quantity;
-      let gross_profit = calculate_profit !weight_avg data in
-
+      let gross_profit = calculate_profit !state.weight_avg data in
+      state := { !state with stock_qty = !state.stock_qty - data.quantity };
+      
       begin match operation_result gross_profit with
-      | Loss -> acc_loss := !acc_loss -. gross_profit; None
+      | Loss -> 
+        state := { !state with acc_loss = !state.acc_loss -. gross_profit };
+        None
       | Win when calculate_amount data > threshold ->
-        let loss, net_profit = calculate_loss_and_profit !acc_loss gross_profit in
-        acc_loss := loss;
-
-        if net_profit > 0. then
-          Some (net_profit *. tax_percent) 
-        else 
-          None
+        let updated_acc_loss, net_profit = calculate_loss_and_profit !state.acc_loss gross_profit in
+        state := { !state with acc_loss = updated_acc_loss };
+        if net_profit > 0. then Some (net_profit *. tax_percent) else None
       | _ -> None
       end
 
